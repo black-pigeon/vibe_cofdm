@@ -132,3 +132,31 @@ Vivado 2022.2 对 `xc7z020clg400-2` 的 out-of-context 综合结果如下，报�
 成 LUT RAM。这里的 WNS 仍是综合后的 out-of-context 结果，完整 PHY 顶层布局布线
 后还需要重新检查。后续若要继续提升吞吐，应优先复用这套 bank 和流水结构，增加
 处理单元或采用双码字交错；不要重新复制 9 份完整标量译码器。
+
+## 实际链路解码性能验证
+
+使用 R2020b MATLAB 完整 PHY 链路，以量化 `q2_nms12` 作为 QC9 的算法对应项，
+对 36、257、2048 字节 payload，在 4、5、6 dB 各运行 50 帧。原始结果见
+[full_link_ldpc_qc9_validation_50f.csv](../results/full_link_ldpc_qc9_validation_50f.csv)，
+按 RTL 实测周期换算后的结果见
+[qc9_decode_performance_50f.csv](../results/qc9_decode_performance_50f.csv)。
+
+RTL 测试得到的周期关系为：
+`cycles_per_codeword = 1621 + 3168 × iterations`。因此平均迭代次数可以直接
+换算为 QC9 的服务吞吐；这个换算包含 BRAM 译码和输出固定开销，但不包含完整 PHY
+顶层的排队延迟。
+
+| Payload | SNR | PER | 平均迭代 | QC9 信息服务率 | MATLAB 空口有效率 | 单 QC9 是否跟得上 |
+|---:|---:|---:|---:|---:|---:|:---:|
+| 36 B | 4 dB | 0 | 2.44 | 4.26 Mbps | 2.71 Mbps | 是 |
+| 257 B | 4 dB | 6% | 2.75 | 3.85 Mbps | 6.18 Mbps | 否 |
+| 257 B | 6 dB | 0 | 1.59 | 5.97 Mbps | 6.58 Mbps | 否 |
+| 2048 B | 4 dB | 14% | 2.93 | 3.65 Mbps | 7.47 Mbps | 否 |
+| 2048 B | 5 dB | 0 | 2.14 | 4.73 Mbps | 8.68 Mbps | 否 |
+| 2048 B | 6 dB | 0 | 1.69 | 5.72 Mbps | 8.68 Mbps | 否 |
+
+这说明当前单个 QC9 核虽然比标量核快很多，但对于高速率长包仍然是吞吐瓶颈，
+即使 SNR 提高到 6 dB 也不能持续跟上 8.68 Mbps 空口速率。短包因为空口到达率
+较低可以满足。下一步应优先验证两个 QC9 处理实例的交错调度，或把同一 bank 结构
+扩展到 18/27 个处理单元；同时加入有界输入 FIFO，测量实际队列水位，而不能只看
+单码字平均迭代次数。
