@@ -3,6 +3,9 @@
 // input/messages Q2 +/-63 (7 bits), extrinsic/post Q2 +/-255 (9 bits),
 // alpha=3/4, nearest rounding with ties away from zero. All large RAM reads
 // are synchronous. First iteration ignores old messages: no clear/epoch RAM.
+// SNR-independent early termination: check all 324 parity equations after
+// EVERY iteration, including the first. A failed final check is a decode
+// failure, not a successful early stop. Payload CRC is checked downstream.
 // Correctness/resource baseline; this scalar core is NOT an air-rate core.
 module cofdm_qcldpc_648_decoder #(parameter integer MAX_ITERS=12)(
     input wire clk,rst,start,in_valid,in_last,
@@ -66,6 +69,10 @@ module cofdm_qcldpc_648_decoder #(parameter integer MAX_ITERS=12)(
     end
     assign busy=(state!=IDLE);
     assign in_ready=(state==LOAD) && !rst;
+    // These conditions are consumed only in DECIDE, after the final parity
+    // result has reached bad_checks. No minimum-iteration or LLR threshold.
+    wire parity_pass = !bad_checks;
+    wire iteration_limit = (iter==5'(MAX_ITERS-1));
     initial if(MAX_ITERS<1 || MAX_ITERS>31) $error("MAX_ITERS must be 1..31");
     always @(posedge clk) begin
         if(rst) begin
@@ -118,8 +125,8 @@ module cofdm_qcldpc_648_decoder #(parameter integer MAX_ITERS=12)(
                 end else begin parity<=parity^post_rd[8];slot<=slot+1'b1;state<=CROM;end
             end
             DECIDE: begin
-                if(!bad_checks || iter==5'(MAX_ITERS-1)) begin
-                    decode_ok<=!bad_checks;syndrome_ok<=!bad_checks;out_idx<=0;state<=OREQ;
+                if(parity_pass || iteration_limit) begin
+                    decode_ok<=parity_pass;syndrome_ok<=parity_pass;out_idx<=0;state<=OREQ;
                 end else begin iter<=iter+1'b1;check_idx<=0;slot<=0;state<=ROM;end
             end
             OREQ: state<=OHOLD;
