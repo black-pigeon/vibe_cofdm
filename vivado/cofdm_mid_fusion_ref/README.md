@@ -31,17 +31,17 @@ RAMB36 不是算法级容量估算，而是 Vivado 对实际 Xilinx 资源的映
 ## 运行
 
 ```bash
-cd /home/wcc/mp_demo/Drone_detection/src_code/无人机备份/RF_Detection
-matlab/vivado/cofdm_mid_fusion_ref/run_all.sh
+cd /path/to/vibe_cofdm
+vivado/cofdm_mid_fusion_ref/run_all.sh
 ```
 
 也可以分开执行：
 
 ```bash
 /opt/Xilinx/Vivado/2022.2/bin/vivado -mode batch \
-  -source matlab/vivado/cofdm_mid_fusion_ref/run_sim.tcl
+  -source vivado/cofdm_mid_fusion_ref/run_sim.tcl
 /opt/Xilinx/Vivado/2022.2/bin/vivado -mode batch \
-  -source matlab/vivado/cofdm_mid_fusion_ref/run_synth.tcl
+  -source vivado/cofdm_mid_fusion_ref/run_synth.tcl
 ```
 
 仿真 testbench 向内核输入 200 个载波、4 个导频，检查 XPM BRAM 读延迟、
