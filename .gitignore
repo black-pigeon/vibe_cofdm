@@ -75,3 +75,6 @@ vivado*.backup.jou
 tools/xfft_bitacc_lin64/*.so
 tools/xfft_bitacc_lin64/*.so.*
 tools/xfft_bitacc_lin64/*.mexa64
+
+# Vivado work cache when launched from repository root
+/.Xil/

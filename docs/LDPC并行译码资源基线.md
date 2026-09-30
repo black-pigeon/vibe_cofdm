@@ -1,5 +1,8 @@
 # QC-LDPC 并行译码资源基线
 
+> 评估口径更正：本页历史 `rtl7` CSV 仅量化输入、内部仍使用浮点译码，不能代表 RTL 定点性能。接收机获知定时/CFO/长度，但信道仍由含噪 LTF 估计。修正后的 Q2 译码和完整 MATLAB 链路结果见[完整链路与 LDPC 评估](完整链路与LDPC评估.md)。历史 CSV 保留，复跑请使用新的输出文件名。
+
+
 本次基线在 XC7Z020CLG400-2、Vivado 2022.2、122.88 MHz 约束下完成。`cofdm_qcldpc_parallel_bank` 复制现有标量分层 NMS 译码器，每个 lane 独立拥有消息 RAM、后验 RAM 和边地址 ROM；上游需要把完整 648 位码字分配给空闲 lane。该基线用于评估复制译码核心的资源和时序，不包含最终的码字调度器、跨 lane FIFO、Payload RAM 和完整 PHY。
 
 运行：
@@ -15,6 +18,8 @@ vivado/cofdm_v2_header_ref/run_synth_qcldpc_parallel_all.sh
 - `vivado/cofdm_v2_header_ref/parallel_clock.xdc`
 
 ## 综合结果
+
+以下为历史综合后结果；脚本当时未设置 out-of-context，顶层还包含大量 lane I/O。WNS 不是布局布线后的 Fmax，也未验证器件封装 I/O 和完整 PHY 的可实现性。
 
 | 并行 lane | LUT | LUT 占 XC7Z020 | FF | BRAM Tile | BRAM 占用 | DSP48 | WNS | 估算总功耗* |
 |---:|---:|---:|---:|---:|---:|---:|---:|---:|
@@ -46,7 +51,7 @@ vivado/cofdm_v2_header_ref/run_synth_qcldpc_parallel_all.sh
 
 ## 2048 字节 Payload 的 1000 帧临界区扫测
 
-文件：[payload_sweep_2048_1000f_345.csv](../results/payload_sweep_2048_1000f_345.csv)。这是已知同步、CFO 和信道条件下的 RTL 7 位 LLR 对照，不包含捕获和 V2 Header 失败。
+文件：[payload_sweep_2048_1000f_345.csv](../results/payload_sweep_2048_1000f_345.csv)。这是已知同步和 CFO、由含噪 LTF 估计信道的历史输入量化/浮点内部译码对照，不包含捕获和 V2 Header 失败。
 
 | SNR | PER | 95% 区间 | 平均迭代 | 需要 lane | Payload Goodput |
 |---:|---:|---:|---:|---:|---:|

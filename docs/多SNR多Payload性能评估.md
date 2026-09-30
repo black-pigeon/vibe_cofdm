@@ -1,5 +1,8 @@
 # 多 SNR、多 Payload 长度的 PHY 性能评估
 
+> 评估口径更正：本页历史 `rtl7` CSV 仅量化输入、内部仍使用浮点译码，不能代表 RTL 定点性能。接收机获知定时/CFO/长度，但信道仍由含噪 LTF 估计。修正后的 Q2 译码和完整 MATLAB 链路结果见[完整链路与 LDPC 评估](完整链路与LDPC评估.md)。历史 CSV 保留，复跑请使用新的输出文件名。
+
+
 日期：2026-09-30。MATLAB R2020b：`/opt/Polyspace/R2020b/`。本报告针对 v2、QPSK、LDPC(648,324)、compact 接收机和 XC7Z020 译码接口基线。
 
 ## 测试方法
@@ -51,7 +54,7 @@ RTL 回归 `bash matlab/rtl/run_checks.sh` 已通过，覆盖 Payload 长度 1�
 
 ## 7 位 LLR Payload 对照
 
-文件：[payload_sweep_rtl7_100f.csv](../results/payload_sweep_rtl7_100f.csv)。这是已知同步/信道条件下的 Payload 结果，`lanes` 是按 122.88 MHz、码字到达间隔 3888 个时钟估算的标量 LDPC 并行路数。
+文件：[payload_sweep_rtl7_100f.csv](../results/payload_sweep_rtl7_100f.csv)。这是已知同步/CFO、由含噪 LTF 估计信道的历史 Payload 结果，`lanes` 是按 122.88 MHz、码字到达间隔 3888 个时钟估算的标量 LDPC 并行路数。
 
 | Payload | SNR | PER（95% 区间） | 平均迭代 | 需要路数 | 标量服务 Goodput |
 |---:|---:|---:|---:|---:|---:|

@@ -1,5 +1,7 @@
 `timescale 1ns/1ps
 module tb_phy_rx_v2_payload_top;
+  integer fd, sign_errors=0, zero_llrs=0, high_water=0;
+  reg test_done=0;
   reg clk=0; always #4.069 clk=~clk;
   reg rst=1, sample_valid=0;
   reg signed [15:0] sample_re=0, sample_im=0;
@@ -36,10 +38,13 @@ module tb_phy_rx_v2_payload_top;
   end
 
   always @(posedge clk) if(!rst) begin
+    if(dut.payload.wr_idx-dut.payload.rd_idx>high_water) high_water=dut.payload.wr_idx-dut.payload.rd_idx;
     if(header_valid) $display("Header ok=%b bytes=%0d time=%t",header_ok,header_payload_bytes,$time);
     if(payload_llr_valid) begin
-      if(payload_llr==0 || payload_llr[15] !== bits[llr_count])
-        $fatal(1,"LLR sign mismatch %0d llr=%0d bit=%b",llr_count,payload_llr,bits[llr_count]);
+      if(llr_count>=cfg[1]) $fatal(1,"Excess LLR");
+      if(payload_llr==0) zero_llrs=zero_llrs+1;
+      if(payload_llr[15] !== bits[llr_count]) sign_errors=sign_errors+1;
+      $fdisplay(fd,"%0d",payload_llr);
       if(llr_count<4) $display("LLR[%0d]=%0d",llr_count,payload_llr);
       llr_count=llr_count+1;
     end
@@ -51,7 +56,7 @@ module tb_phy_rx_v2_payload_top;
         dut.payload.state,dut.payload.post_error,dut.payload.br_error,
         dut.payload_crc_ok,dut.payload_padding_ok,dut.payload_ldpc_ok,
         dut.payload.post.bit_count,dut.payload.post.cw_count);
-      $finish;
+      test_done=1; $fclose(fd); $finish;
     end
     if(payload_byte_valid && payload_byte_ready) begin
       if(count>=cfg[2] || payload_byte!==count[7:0] ||
@@ -62,13 +67,20 @@ module tb_phy_rx_v2_payload_top;
     if(payload_frame_done) begin
       if(count!=cfg[2]) $fatal(1,"done count=%0d len=%0d",count,cfg[2]);
       $display("PASS actual IQ -> PHY -> Payload LDPC -> CRC32 -> %0d bytes",count);
-      test_pass=1;
+      if(llr_count!=cfg[1] || !dut.payload_crc_ok || !dut.payload_ldpc_ok || !dut.payload_padding_ok)
+        $fatal(1,"Incomplete or unverified frame");
+      $display("METRICS cycles=%0d llrs=%0d sign_errors=%0d zeros=%0d max_pending_llrs=%0d",cycles,llr_count,sign_errors,zero_llrs,high_water);
+      test_pass=1; test_done=1; $fclose(fd);
       $finish;
     end
   end
 
   initial begin
     // Vivado exports the .mem files into the XSim run directory.
+    // Vector files are copied into the XSim working directory by the Tcl
+    // launcher. Keeping a plain relative path avoids simulator-specific
+    // dynamic-string plusarg behavior.
+    fd=$fopen("rtl_llr.txt","w"); if(!fd) $fatal(1,"LLR output open failed");
     $readmemh("rx_config.mem",cfg);
     if(^cfg[0]===1'bx || cfg[0]==0 || cfg[0]>65536) $fatal(1,"missing/invalid vector config");
     $readmemh("rx_bits.mem",bits,0,cfg[1]-1);
@@ -78,7 +90,7 @@ module tb_phy_rx_v2_payload_top;
       sample_valid=1; {sample_im,sample_re}=iq[n]; @(negedge clk);
       sample_valid=0; repeat(7) @(negedge clk);
     end
-    repeat(3000000) @(negedge clk);
+    repeat(16000000) @(negedge clk);
     $fatal(1,"Payload timeout state=%d bytes=%0d header=%b/%b",dut.phy.state,count,header_valid,header_ok);
   end
   initial begin

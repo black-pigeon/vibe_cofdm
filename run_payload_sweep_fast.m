@@ -1,15 +1,16 @@
 function results = run_payload_sweep_fast(lengths,snrDb,nFrames,outPath,options)
 % Fast payload-only Monte Carlo model for the v2 PHY.
 %
-% Timing, CFO, channel and payload length are supplied to the receiver.  The
+% Timing, CFO and payload length are supplied to the receiver; channel is
+% estimated from noisy LTFs. The
 % waveform still passes through the same TX, multipath and AWGN functions and
 % the same pilot/channel/LLR/LDPC code used by cofdm.rx; acquisition and the
 % V2 header are deliberately bypassed.  Consequently this is a payload
 % implementation/SNR sweep, not an end-to-end sensitivity result.  Use
 % run_variable_sweep or run_sensitivity_sweep for the latter.
 %
-% The default decoder mode (rtl7) rounds and saturates LLRs to the signed
-% 7-bit interface used by cofdm_payload_rx before decoding.  Set
+% rtl7 uses Q2 input/messages and Q2 posterior saturation of the RTL decoder.
+% This models decoder arithmetic, not the fixed-point RTL frontend. Set
 % options.decoderMode='float' for an algorithm ceiling comparison.
 if nargin<1 || isempty(lengths), lengths=[1 36 257 1024 2048]; end
 if nargin<2 || isempty(snrDb), snrDb=0:2:12; end
@@ -48,7 +49,8 @@ for il=1:numel(lengths)
             [y,truth]=cofdm.channel(wave,base,p);
             [llr,cw,cfg]=payload_llr_known_capture(y,p,truth,c,code);
             if strcmp(options.decoderMode,'rtl7')
-                llr=max(-63,min(63,round(llr)));
+                llr=max(-63,min(63,round(4*llr)))/4;
+                c.quantizedDecoder=true;
             end
             blocks=reshape(llr(1:c.nCodewords*code.n),code.n,[]);
             u=false(code.k,c.nCodewords); oks=false(c.nCodewords,1); its=zeros(c.nCodewords,1);
@@ -89,10 +91,12 @@ if ~isempty(outPath)
     writetable(results,outPath);
     manifest=struct('complete',true,'matlabVersion',version,'seed',options.seed,...
         'lengths',lengths,'snrDb',snrDb,'framesPerPoint',nFrames,'receiverMode',options.receiverMode,...
-        'decoderMode',options.decoderMode,'channel','static [0,3,9] multipath, known timing/CFO/channel',...
+        'decoderMode',options.decoderMode,'channel','static multipath; known timing/CFO; noisy LTF channel estimate',...
         'sampleSnrDefinition','complex active-frame sample SNR; noise bandwidth Fs',...
         'scope','payload-only oracle; acquisition and V2 header bypassed',...
-        'rtlCycleCalibration','scalar LDPC 23008 cycles/iteration at 122.88 MHz; arrival 3888 cycles/codeword');
+        'modelRevision','Q2-input-message-posterior-v2',...
+        'quantization','rtl7: round(4*LLR), saturate +/-63, decode q/4 with quantizedDecoder=true',...
+        'rtlCycleCalibration','23008*meanIt approximate only; 258550 cycles at 12 iterations; 122.88 MHz');
     fid=fopen([outPath '.json'],'w'); assert(fid>=0); cl=onCleanup(@()fclose(fid));
     fprintf(fid,'%s\n',jsonencode(manifest));
 end

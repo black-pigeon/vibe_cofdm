@@ -75,8 +75,12 @@ octave --no-gui --quiet --eval "addpath('matlab'); run_demo(); addpath('matlab/t
 | `docs/FPGA实现规划.md` | 7020 模块、处理周期、存储、位宽、接口和实施路线 |
 | `docs/远距离与高速设计.md` | 链路预算、MCS、功放、导频与可靠性取舍 |
 | `docs/验证计划.md` | 仿真矩阵、指标定义、硬件验证门槛 |
+| `docs/完整链路与LDPC评估.md` | 完整链路回放、定点译码对比、码长/码率筛选与 7020 选型 |
 | `docs/算法深化设计.md` | 实现损失、算法消融、定时/估计/编码/帧开销研究顺序 |
 | `run_receiver_comparison.m` | 四种接收分支在同一 IQ 上的配对 PER/吞吐对照 |
+| `run_full_link_ldpc_comparison.m` | 同一 IQ 上的完整 MATLAB 前端与 Q2 NMS 迭代数对比 |
+| `run_ldpc_family_screen.m` | R2020b WLAN Toolbox 编码层码长/码率 AWGN 筛选 |
+| `verify_full_link_llr.m` | 使用 RTL 捕获 LLR 的 MATLAB Q2 译码复核 |
 | `results/RECEIVER_ALGORITHMS.md` | 改进接收机实测结果与适用边界 |
 | `docs/低复杂度接收机设计.md` | FFT 窗口、FIR 去噪、9 点搜索及 7020 运算/ROM 预算 |
 | `run_compact_comparison.m` | 五种信道下对比上一轮与本轮算法，输出配对退化/恢复及 FFT 窗诊断 |
