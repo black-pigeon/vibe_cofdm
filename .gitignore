@@ -4,6 +4,7 @@ results/*.png
 results/**/*.mat
 results/**/*.fig
 results/**/*.png
+results/figures/
 vectors/generated/*.mat
 *.asv
 octave-workspace
