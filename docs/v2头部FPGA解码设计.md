@@ -18,10 +18,10 @@ v2 Header 不是 LDPC。当前 MATLAB 定义为：
 
 实现文件：
 
-- [`cofdm_v2_header_decoder.sv`](/home/wcc/mp_demo/Drone_detection/src_code/无人机备份/RF_Detection/matlab/rtl/cofdm_v2_header_decoder.sv:1)：64 状态、54 步 ACS 和 traceback；
-- [`cofdm_v2_header_frontend.sv`](/home/wcc/mp_demo/Drone_detection/src_code/无人机备份/RF_Detection/matlab/rtl/cofdm_v2_header_frontend.sv:1)：单个 Header 符号入口；
-- [`cofdm_v2_rx_header_path.sv`](/home/wcc/mp_demo/Drone_detection/src_code/无人机备份/RF_Detection/matlab/rtl/cofdm_v2_rx_header_path.sv:1)：Header 正确后才释放 Payload LLR。
-- [`cofdm_v2_header_decoder_tdm.sv`](/home/wcc/mp_demo/Drone_detection/src_code/无人机备份/RF_Detection/matlab/rtl/cofdm_v2_header_decoder_tdm.sv:1)：低资源时分复用版本。
+- [`cofdm_v2_header_decoder.sv`](../rtl/cofdm_v2_header_decoder.sv:1)：64 状态、54 步 ACS 和 traceback；
+- [`cofdm_v2_header_frontend.sv`](../rtl/cofdm_v2_header_frontend.sv:1)：单个 Header 符号入口；
+- [`cofdm_v2_rx_header_path.sv`](../rtl/cofdm_v2_rx_header_path.sv:1)：Header 正确后才释放 Payload LLR。
+- [`cofdm_v2_header_decoder_tdm.sv`](../rtl/cofdm_v2_header_decoder_tdm.sv:1)：低资源时分复用版本。
 
 完全展开参考版本综合为 0 DSP、0 BRAM、10969 LUT、5255 FF，122.88 MHz 下
 WNS +0.625 ns、TNS 0。最终建议使用 TDM 版本：每拍只更新一个目标状态，并把
@@ -43,7 +43,7 @@ RAMB18，进一步减少 FF；完全展开版本保留为 bit-exact 参考模型
 最大片长增加无限 RAM。Header 解码器的 `payload_bytes`、`scrambler_seed` 和
 `midamble_code` 必须在闸门打开前锁存，并经过范围校验。
 
-资源预算集成顶层为 [`cofdm_pre_ldpc_v2_decode_top.sv`](/home/wcc/mp_demo/Drone_detection/src_code/无人机备份/RF_Detection/matlab/rtl/cofdm_pre_ldpc_v2_decode_top.sv:1)。Vivado 实测占用 4268 LUT、3926 FF、16 DSP、3 个 BRAM Tile，122.88 MHz 下 WNS +0.683 ns、TNS 0。该数字包含预 LDPC 符号链、XPM FIFO 和 TDM Header 门控，可作为后续接入 QC-LDPC 前的资源基线。
+资源预算集成顶层为 [`cofdm_pre_ldpc_v2_decode_top.sv`](../rtl/cofdm_pre_ldpc_v2_decode_top.sv:1)。Vivado 实测占用 4268 LUT、3926 FF、16 DSP、3 个 BRAM Tile，122.88 MHz 下 WNS +0.683 ns、TNS 0。该数字包含预 LDPC 符号链、XPM FIFO 和 TDM Header 门控，可作为后续接入 QC-LDPC 前的资源基线。
 
 验证命令：
 

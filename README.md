@@ -2,7 +2,7 @@
 
 **整体架构入口：** [链路结构与模块职责](docs/整体链路架构.md) · [Word版](docs/整体链路架构.docx)。包含总览、收发结构图、帧内数据流、源码接口，以及当前PHY与未来FPGA/自组网协议的边界。
 
-本目录与现有无人机检测 C++ 工程独立。用户指定：15.36 MS/s、256 点 FFT、32 点 CP、短训练、两个 ZC 长训练、数据导频、中间训练、LDPC；FPGA 目标为 Zynq-7020。
+本目录是独立的 COFDM 建模与 FPGA 参考工程。系统参数为：15.36 MS/s、256 点 FFT、32 点 CP、短训练、两个 ZC 长训练、数据导频、中间训练和 LDPC；FPGA 目标为 Zynq-7020。
 
 ## 已完成的模型
 
@@ -44,7 +44,7 @@ receiver_budget();
 在 MATLAB 中：
 
 ```matlab
-cd('/home/wcc/mp_demo/Drone_detection/src_code/无人机备份/RF_Detection/matlab')
+cd('/path/to/vibe_cofdm')
 run_demo();
 addpath('tests'); run_tests();
 run_snr_sweep([0 2 4 6 8 12], 20, 'results/snr_smoke.csv');

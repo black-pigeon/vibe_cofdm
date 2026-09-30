@@ -60,7 +60,7 @@ STF 检测只产生候选事件，不能单独作为帧确认。LTF 匹配峰值
 
 `matlab/vivado/cofdm_ltf_sync_ref/run_synth.tcl` 已切换为 `CANDIDATES=17 MATCHER_TDM=1`。并行 5 路旧实现综合结果为 122 个 DSP，且 WNS=-13.316 ns；它只作为快速参考，不能用于 7020 最终实现。
 
-LTF 模板已经改为 Vivado `blk_mem_gen` ROM IP。COE 文件为 [cofdm_ltf_template.coe](/home/wcc/mp_demo/Drone_detection/src_code/无人机备份/RF_Detection/matlab/vivado/cofdm_ltf_sync_ref/cofdm_ltf_template.coe)，每个 32 位字为 `{Re[15:0], Im[15:0]}`。工程脚本会自动创建 `cofdm_ltf_template_rom_ip`，设置 256×32、单口 ROM、初始化文件和 1 拍读延迟。
+LTF 模板已经改为 Vivado `blk_mem_gen` ROM IP。COE 文件为 [cofdm_ltf_template.coe](../vivado/cofdm_ltf_sync_ref/cofdm_ltf_template.coe)，每个 32 位字为 `{Re[15:0], Im[15:0]}`。工程脚本会自动创建 `cofdm_ltf_template_rom_ip`，设置 256×32、单口 ROM、初始化文件和 1 拍读延迟。
 
 低资源版本综合后约 575 LUT、695 FF、4 DSP、1 个 RAMB36 和 1 个 RAMB18，122.88 MHz 下 WNS=+0.561 ns，约束已满足。样本缓存使用显式 `RAMB36E1`，LTF 模板由 ROM IP 实现；`verify_ltf_coe.py` 会检查 COE 与行为级 RTL 的 256 个字逐项一致。
 
