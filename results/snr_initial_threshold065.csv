@@ -1,0 +1,5 @@
+sample_snr_db,frames,per,sync_fail_rate,header_fail_rate,conditional_payload_ber,mean_iterations,goodput_mbps
+4,20,1,1,0,NaN,NaN,0
+8,20,0,0,0,0,1.675,7.4938182
+12,20,0,0,0,0,1,7.4938182
+16,20,0,0,0,0,1,7.4938182

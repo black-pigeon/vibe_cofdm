@@ -1,0 +1,2 @@
+COUNT=96 LLR_SHIFT=37 YW=16 HW=18 INV_W=24
+matched=conj(H)*Y; arithmetic right shift and signed saturation

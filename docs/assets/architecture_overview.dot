@@ -1,0 +1,13 @@
+digraph G {
+ graph [rankdir=TB, bgcolor="white", pad=0.22, nodesep=0.35, ranksep=0.42, dpi=170];
+ node [shape=box, style="rounded,filled", fillcolor="#EDF3FA", color="#44668B", fontname="Noto Sans CJK SC", fontsize=12, margin="0.16,0.10"];
+ edge [color="#536579", arrowsize=0.75, fontname="Noto Sans CJK SC", fontsize=10];
+ upper [label="应用 / MAC / 组网策略（待实现）\n业务队列 · 节点地址 · 时隙 / 重传 / 路由", style="rounded,dashed", fillcolor="white"];
+ tx [label="PHY 发送端\n644字节 → 10560点IQ"];
+ ch [label="仿真信道\n静态多径 · 帧偏移 · CFO · AWGN", fillcolor="#FFF4DE"];
+ rx [label="PHY 接收端\nIQ → 同步 / 估计 / 译码 → 业务载荷"];
+ lower [label="业务交付与反馈（协议待实现）\n只有 r.ok=true 才接收该业务帧", style="rounded,dashed", fillcolor="white"];
+ rf [label="实际射频链路（待集成）\nDAC / 发射机 / 空口 / 接收机 / ADC", style="rounded,dashed", fillcolor="white"];
+ upper -> tx -> ch -> rx -> lower;
+ ch -> rf [style=dashed, arrowhead=none, label="未来替换模型边界"];
+}

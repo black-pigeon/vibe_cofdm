@@ -1,0 +1,72 @@
+results/*.mat
+results/*.fig
+results/*.png
+results/**/*.mat
+results/**/*.fig
+results/**/*.png
+vectors/generated/*.mat
+*.asv
+octave-workspace
+**/__pycache__/
+*.pyc
+
+# MATLAB/Octave temporary output
+*.autosave
+*.bak
+*.m~
+matlab/matlab/
+
+# Vivado projects are reproducible from the checked-in Tcl/XDC/COE files.
+# Keep source scripts and hand-written constraints; omit generated projects,
+# IP output products, synthesis/simulation runs, logs and reports.
+vivado/**/project*/
+vivado/**/.Xil/
+vivado/**/*.cache/
+vivado/**/*.gen/
+vivado/**/*.runs/
+vivado/**/*.sim/
+vivado/**/*.srcs/
+vivado/**/ip_user_files/
+vivado/**/probe_project/
+vivado/**/reports_*/
+vivado/**/reports/
+vivado/**/*.xpr
+vivado/**/*.dcp
+vivado/**/*.jou
+vivado/**/*.log
+vivado/**/*.pb
+vivado/**/*.wdb
+vivado/**/*.wlf
+vivado/**/*.str
+vivado/**/*.rpt
+vivado/**/*.xml
+vivado/**/*.wdf
+vivado/**/*.wpc
+vivado/**/*.rst
+vivado/**/*.bat
+vivado/**/*.js
+vivado/**/*.vhd
+vivado/**/*.v
+vivado/**/*.vh
+vivado/**/*.xci
+vivado/**/*.veo
+vivado/**/*.vho
+vivado/**/*.lpr
+vivado/**/*.wcfg
+vivado/**/*.ltx
+vivado/**/*.xsim*
+vivado/**/*.xdbg
+vivado/**/*.svtype
+vivado/**/*.rtti
+vivado/**/*.reloc
+vivado/**/*.o
+vivado/**/*.so
+vivado/**/*.a
+vivado/**/*.dll
+vivado/**/*.exe
+
+# Optional Xilinx FFT bit-accurate binaries are local tool installations,
+# not project source and may carry separate redistribution terms.
+tools/xfft_bitacc_lin64/*.so
+tools/xfft_bitacc_lin64/*.so.*
+tools/xfft_bitacc_lin64/*.mexa64

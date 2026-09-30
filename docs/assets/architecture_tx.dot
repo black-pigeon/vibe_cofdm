@@ -1,0 +1,23 @@
+digraph G {
+ graph [rankdir=TB, bgcolor="white", pad=0.2, nodesep=0.35, ranksep=0.35, dpi=170];
+ node [shape=box, style="rounded,filled", fillcolor="#EDF3FA", color="#44668B", fontname="Noto Sans CJK SC", fontsize=12, margin="0.12,0.08"];
+ edge [color="#536579", arrowsize=0.7, fontname="Noto Sans CJK SC", fontsize=10];
+ p0 [label="载荷644字节\n转比特 → CRC32 → 扰码"];
+ p1 [label="16×324位分块\nQC-LDPC → 10368编码位"];
+ p2 [label="27×384位装载\n符号内交织 → QPSK"];
+ h0 [label="64位PHY字段\nCRC16 → 补零至324位"];
+ h1 [label="QC-LDPC → 648位\n编码外补零至768位"];
+ h2 [label="帧头扰码 → BPSK\n4×192个数据载波值"];
+ {rank=same;p0;h0;} {rank=same;p1;h1;} {rank=same;p2;h2;}
+ p0 -> p1 -> p2; h0 -> h1 -> h2;
+ map [label="载波映射\n192数据 + 8导频，DC / 保护带置零"];
+ ofdm [label="256点 IFFT → 幅度缩放 → 32点CP"];
+ train [label="已知训练生成\nSTF时域周期 / 两个ZC LTF / MID", fillcolor="#E8F4EB"];
+ pilot [label="PRBS导频生成\n8个已知BPSK值", fillcolor="#E8F4EB"];
+ mux [label="帧编排 / 时域拼接\nSTF → LTF1/2 → HEADER → DATA / MID"];
+ out [label="尾部32点GUARD\n输出复数IQ：10560点"];
+ p2 -> map; h2 -> map; pilot -> map;
+ map -> ofdm -> mux -> out;
+ train -> ofdm [label="LTF / MID频域值"];
+ train -> mux [label="STF直接进入"];
+}

@@ -1,0 +1,2 @@
+windows,samples_per_window,window_seconds,stf_candidates,sync_accepts,header_accepts,payload_accepts,stf_upper95,sync_upper95,header_upper95,payload_upper95
+1000,32320,0.00210416666666667,0,0,0,0,0.00299124954509538,0.00299124954509538,0.00299124954509538,0.00299124954509538

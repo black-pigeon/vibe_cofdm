@@ -1,0 +1,2 @@
+sample_snr_db,frames,full_errors,oracle_payload_errors,full_per,oracle_per,oracle_ci95_low,oracle_ci95_high,oracle_upper95
+2,300,300,1,1,0.00333333333333333,8.43891323177975e-05,0.0184312520480688,0.0157145548915849

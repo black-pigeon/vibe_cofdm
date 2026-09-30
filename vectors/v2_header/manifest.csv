@@ -1,0 +1,5 @@
+case,payload_bytes,seed,midamble,expected_ok
+valid_1,1,1,0,1
+invalid_fields,1,1,0,0
+valid_2,257,93,1,1
+valid_3,2048,127,2,1

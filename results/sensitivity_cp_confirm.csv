@@ -1,0 +1,3 @@
+channel,receiver,payload_bytes,sample_snr_db,frames,errors,sync_failures,stf_failures,header_failures,payload_failures,per,ci95_low,ci95_high,upper95,header_per_given_sync,payload_per_given_header,unsafe_fft,cfo_rmse_hz,mean_ldpc_iterations,slot_us,phy_goodput_mbps,rescues_vs_first,regressions_vs_first
+cp_edge,compact,1500,6,300,3,0,0,1,2,0.01,0.00206700723509234,0.0289445112556923,0.0256413930826092,0.00333333333333333,0.00668896321070234,1,3024.12921286104,2.49348706213695,1437.5,8.26434782608696,0,0
+cp_edge,compact,1500,7,300,0,0,0,0,0,0,0,0.0122209746942937,0.00993608194445783,0,0,0,444.786269460792,2.06885964912281,1437.5,8.34782608695652,0,0

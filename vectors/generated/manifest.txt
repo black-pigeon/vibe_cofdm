@@ -1,0 +1,8 @@
+COFDM v0.1 profile=1 seq=1 seed=20260923
+TX columns I,Q; signed decimal 16-bit; value=integer/16384. No CSV headers.
+TX samples=10560 (includes 32 zero guard); IFFT=sqrt(256)*ifft; TX scale=0.25.
+Bits: bytes MSB-first, codewords sequential/systematic then parity, QPSK I bit then Q bit, 0=>positive.
+QC H: row i column mod(i+shift,27), zero-based; -1 absent.
+Interleaver: transmitted bit i = source bit mod(13*i,384), zero-based.
+LTF CSV columns signed_k,Re_LTF1,Re_LTF2,Im_LTF1,Im_LTF2.
+PAPR_sample_db=9.22973403 clipped_components=0

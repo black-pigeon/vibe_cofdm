@@ -1,0 +1,6 @@
+scenario,trials,snr_db,true_cfo_hz,stf_detection_rate,ltf_capture_rate,sync_success_rate,cp_window_rate,coarse_cfo_rmse_hz,fine_cfo_rmse_hz,final_cfo_rmse_hz,position_bias_samples,position_rmse_samples,false_alarm_rate,periodic_tone_accept_rate,candidate_reject_rate
+noiseless,20,Inf,0,1,1,1,1,0,1.09128095e-13,1.09128095e-13,0,0,NaN,NaN,0
+awgn_cfo,20,20,135000,1,1,1,1,1786.89967,41.3515573,41.3515573,0,0,NaN,NaN,0
+multipath,20,18,-220000,1,1,1,1,4308.45261,68.8929351,68.8929351,0,0,NaN,NaN,0
+low_snr,20,8,65000,1,1,1,1,3511.52611,187.610829,187.610829,0,0,NaN,NaN,0
+noise_only,100,NaN,NaN,NaN,NaN,0,NaN,NaN,NaN,NaN,NaN,NaN,0,0,NaN

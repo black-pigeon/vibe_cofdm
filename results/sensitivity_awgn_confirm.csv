@@ -1,0 +1,2 @@
+channel,receiver,payload_bytes,sample_snr_db,frames,errors,sync_failures,stf_failures,header_failures,payload_failures,per,ci95_low,ci95_high,upper95,header_per_given_sync,payload_per_given_header,unsafe_fft,cfo_rmse_hz,mean_ldpc_iterations,slot_us,phy_goodput_mbps,rescues_vs_first,regressions_vs_first
+awgn,compact,1500,6,300,0,0,0,0,0,0,0,0.0122209746942937,0.00993608194445783,0,0,0,286.513741365923,1.41105263157895,1437.5,8.34782608695652,0,0
