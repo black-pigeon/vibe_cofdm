@@ -146,6 +146,11 @@ vvp /tmp/cofdm_packetizer_tb
 iverilog -g2012 -s tb_qcldpc_648_decoder -o /tmp/cofdm_qcldpc_tb \
   "$RTL/cofdm_qcldpc_edge_rom.sv" "$RTL/cofdm_qcldpc_648_decoder.sv" "$RTL/tb/tb_qcldpc_648_decoder.sv"
 vvp /tmp/cofdm_qcldpc_tb
+iverilog -g2012 -s tb_qcldpc_codeword_scheduler -o /tmp/cofdm_qcldpc_scheduler_tb \
+  "$RTL/cofdm_qcldpc_edge_rom.sv" "$RTL/cofdm_qcldpc_648_decoder.sv" \
+  "$RTL/cofdm_qcldpc_parallel_bank.sv" "$RTL/cofdm_qcldpc_codeword_scheduler.sv" \
+  "$RTL/tb/tb_qcldpc_codeword_scheduler.sv"
+vvp /tmp/cofdm_qcldpc_scheduler_tb
 iverilog -g2012 -s tb_qcldpc_648_vector -o /tmp/cofdm_qcldpc_vec_tb \
   "$RTL/cofdm_qcldpc_edge_rom.sv" "$RTL/cofdm_qcldpc_648_decoder.sv" "$RTL/tb/tb_qcldpc_648_vector.sv"
 vvp /tmp/cofdm_qcldpc_vec_tb
@@ -193,6 +198,9 @@ verilator --lint-only -Wall --top-module cofdm_header_descrambler "$RTL/cofdm_he
 verilator --lint-only -Wall --top-module cofdm_llr_deinterleaver "$RTL/cofdm_llr_deinterleaver.sv"
 verilator --lint-only -Wall --top-module cofdm_qcldpc_648_decoder \
   "$RTL/cofdm_qcldpc_edge_rom.sv" "$RTL/cofdm_qcldpc_648_decoder.sv"
+verilator --lint-only -Wall --top-module cofdm_qcldpc_codeword_scheduler \
+  "$RTL/cofdm_qcldpc_edge_rom.sv" "$RTL/cofdm_qcldpc_648_decoder.sv" \
+  "$RTL/cofdm_qcldpc_parallel_bank.sv" "$RTL/cofdm_qcldpc_codeword_scheduler.sv"
 verilator --lint-only -Wall --top-module cofdm_payload_codeword_bridge \
   "$RTL/cofdm_qcldpc_edge_rom.sv" "$RTL/cofdm_qcldpc_648_decoder.sv" "$RTL/cofdm_payload_codeword_bridge.sv"
 verilator --lint-only -Wall --top-module cofdm_common_phase_rotator \

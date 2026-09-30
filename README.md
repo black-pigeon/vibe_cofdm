@@ -81,6 +81,7 @@ octave --no-gui --quiet --eval "addpath('matlab'); run_demo(); addpath('matlab/t
 | `run_full_link_ldpc_comparison.m` | 同一 IQ 上的完整 MATLAB 前端与 Q2 NMS 迭代数对比 |
 | `run_ldpc_family_screen.m` | R2020b WLAN Toolbox 编码层码长/码率 AWGN 筛选 |
 | `verify_full_link_llr.m` | 使用 RTL 捕获 LLR 的 MATLAB Q2 译码复核 |
+| `rtl/cofdm_qcldpc_codeword_scheduler.sv` | 多标量译码器的有界码字 FIFO/顺序调度参考实现 |
 | `results/RECEIVER_ALGORITHMS.md` | 改进接收机实测结果与适用边界 |
 | `docs/低复杂度接收机设计.md` | FFT 窗口、FIR 去噪、9 点搜索及 7020 运算/ROM 预算 |
 | `run_compact_comparison.m` | 五种信道下对比上一轮与本轮算法，输出配对退化/恢复及 FFT 窗诊断 |
