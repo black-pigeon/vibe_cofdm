@@ -75,6 +75,11 @@ for il=1:numel(lengths)
         row={"short_multipath",options.decoderMode,L,snrDb(is),nFrames,bad,ldpcBad,crcBad,bad/nFrames,lo,hi,upper,...
             c.nCodewords,c.nDataSymbols,slotUs,ideal,goodput,mi,itMax,scalarCycles,serviceUs,serviceGoodput,lanes,worst};
         rows(end+1,:)=row; %#ok<AGROW>
+        % Persist after every SNR/length point so a long Monte Carlo run can
+        % be resumed or inspected even if MATLAB is interrupted.
+        if ~isempty(outPath)
+            writetable(cell2table(rows,'VariableNames',names),outPath);
+        end
         fprintf('%s L=%d SNR=%g PER=%d/%d meanIt=%.2f ideal=%.3f Mbps lanes=%d\n',...
             options.decoderMode,L,snrDb(is),bad,nFrames,mi,ideal,lanes);
     end

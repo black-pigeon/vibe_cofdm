@@ -1,0 +1,1 @@
+{"complete":true,"matlabVersion":"9.9.0.1467703","seed":20260930,"payloadBytes":2048,"snrDb":[3,4,5],"framesPerPoint":1000,"receiverMode":"compact","decoderMode":"rtl7","scope":"payload-only oracle; acquisition and V2 header bypassed","sourceFiles":["results/payload_sweep_2048_1000f_3.csv","results/payload_sweep_2048_1000f_4.csv","results/payload_sweep_2048_1000f_5.csv"]}

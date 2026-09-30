@@ -1,0 +1,2 @@
+channel,decoder_mode,payload_bytes,sample_snr_db,frames,packet_errors,ldpc_failures,crc_failures,per,ci95_low,ci95_high,upper95,codewords,data_symbols,slot_us,ideal_goodput_mbps,goodput_mbps,mean_iterations,max_iterations,scalar_ldpc_cycles,scalar_ldpc_service_us,scalar_service_goodput_mbps,required_parallel_lanes,worst_case_parallel_lanes
+short_multipath,rtl7,2048,4,1000,263,263,214,0.263,0.2359435246803,0.291459361439263,0.286901164919978,51,87,1887.5,8.68026490066225,6.39735523178808,3.10078431372549,12,71342.8454901961,580.589562908497,0.553325313585452,19,67

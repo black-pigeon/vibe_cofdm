@@ -65,6 +65,10 @@ vivado/**/*.so
 vivado/**/*.a
 vivado/**/*.dll
 vivado/**/*.exe
+vivado*.log
+vivado*.jou
+vivado*.backup.log
+vivado*.backup.jou
 
 # Optional Xilinx FFT bit-accurate binaries are local tool installations,
 # not project source and may carry separate redistribution terms.
