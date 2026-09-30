@@ -11,6 +11,7 @@ set report_dir [file join $script_dir reports_qcldpc_scheduler L$lanes]
 file mkdir $report_dir
 read_verilog -sv [file join $rtl_dir cofdm_qcldpc_edge_rom.sv]
 read_verilog -sv [file join $rtl_dir cofdm_qcldpc_648_decoder.sv]
+read_verilog -sv [file join $rtl_dir cofdm_qcldpc_bram_replica.sv]
 read_verilog -sv [file join $rtl_dir cofdm_qcldpc_parallel_bank.sv]
 read_verilog -sv [file join $rtl_dir cofdm_qcldpc_codeword_scheduler.sv]
 read_xdc [file join $script_dir parallel_clock.xdc]

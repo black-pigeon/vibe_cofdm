@@ -60,3 +60,19 @@ vivado/cofdm_v2_header_ref/run_synth_qcldpc_parallel_all.sh
 | 5 dB | 0.016 | 0.009–0.026 | 2.21 | 14 | 8.541 Mbps |
 
 结果表明 2048 字节长包的 Payload-only 工作区间大约在 4～5 dB：5 dB 时已经接近理想空口速率，但仍有 1.6% 包错；3 dB 和 4 dB 分别受到大量 LDPC 失败影响。完整同步链路还会叠加 STF/LTF 捕获损失，因此不能把 5 dB 直接作为整机灵敏度指标。
+
+## 2026-09-30：含 FIFO 调度器和 BRAM 复制的实测综合
+
+本轮把码字 FIFO、输入顺序恢复和译码 lane 放在同一个 `cofdm_qcldpc_codeword_scheduler` 顶层中综合，FIFO 存储改为每个 lane 一份独立的同步双口 BRAM。这样每个译码 lane 可以独立读一个码字，避免共享数组产生的多路动态读 mux。脚本为 `vivado/cofdm_v2_header_ref/run_synth_qcldpc_scheduler.tcl`，报告位于 `vivado/cofdm_v2_header_ref/reports_qcldpc_scheduler/L*`。
+
+| lane | LUT | LUT 占用 | FF | BRAM Tile | BRAM 占用 | DSP48 | WNS @122.88 MHz | 结论 |
+|---:|---:|---:|---:|---:|---:|---:|---:|---|
+| 3 | 902 | 1.70% | 429 | 10.5 | 7.50% | 0 | +1.898 ns | 可作为低资源验证档 |
+| 9 | 2673 | 5.02% | 1208 | 39 | 27.86% | 0 | +1.535 ns | 当前 7020 的推荐基线 |
+| 27 | 58181 | 109.36% | 4045 | 162.5 | 116.07% | 28 | +0.730 ns | 不可实现，综合已退化为大量 LUT RAM |
+
+这里的 27 路结果说明，完整调度器的 FIFO 复制成本随 lane 数增加得更快：每路不仅复制译码器，还复制整个码字缓存。它不能作为 XC7Z020 的量产方案。9 路在综合层面留有约 72% BRAM 和 95% LUT 余量给 XFFT、同步、均衡和协议接口，但最终仍需完整顶层布局布线后复核。
+
+调度器回归已覆盖 8 个连续码字，并验证 FIFO 深度为 3 时的多次读写槽位回绕；非 2 的幂 FIFO 深度在 RTL 中使用显式 `FIFO_DEPTH-1` 回绕。当前码字输入、顺序输出、syndrome 提前退出和长包队列行为均通过 `bash rtl/run_checks.sh`。
+
+下一步不再增加完整标量 lane，而是把 9 路作为性能基线，设计共享 BRAM 的 QC 子块并行译码器。目标是用 9/27 个变量节点或校验节点处理单元服务多个码字，同时保留有界 FIFO、顺序恢复和 syndrome 提前退出，从而把 BRAM 复制开销变成可控的 bank 化存储。

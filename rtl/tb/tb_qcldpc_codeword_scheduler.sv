@@ -5,6 +5,7 @@ module tb_qcldpc_codeword_scheduler;
   wire ir,ov,ol,ob,ok,busy; wire [4:0] it; wire [15:0] oi,q;
   wire done,err;
   integer i,words=0,bits=0,cycles=0;
+  localparam integer WORDS_TARGET=8;
   cofdm_qcldpc_codeword_scheduler #(.LANES(2),.FIFO_DEPTH(3)) dut(
     .clk,.rst,.in_valid(iv),.in_ready(ir),.in_last(il),.in_llr(x),
     .out_valid(ov),.out_ready(ordy),.out_last(ol),.out_bit(ob),
@@ -23,15 +24,15 @@ module tb_qcldpc_codeword_scheduler;
           words=words+1;bits=0;
         end
       end
-      if(words==3) begin
-        $display("PASS scheduler 3 codewords ordered across 2 lanes cycles=%0d",cycles);
+      if(words==WORDS_TARGET) begin
+        $display("PASS scheduler %0d codewords ordered across 2 lanes with FIFO wrap cycles=%0d",WORDS_TARGET,cycles);
         $finish;
       end
     end
   end
   initial begin
     repeat(4) @(negedge clk);rst=0;
-    for(i=0;i<1944;i=i+1) begin
+    for(i=0;i<WORDS_TARGET*648;i=i+1) begin
       while(!ir) @(negedge clk);
       iv=1;il=(i%648==647);@(negedge clk);iv=0;il=0;
     end

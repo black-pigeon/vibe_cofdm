@@ -26,7 +26,9 @@ module cofdm_qcldpc_codeword_scheduler #(
     localparam integer SEQ_W=16;
     localparam integer LANE_W=(LANES<=1)?1:$clog2(LANES);
     localparam [CNT_W-1:0] FIFO_DEPTH_CONST=CNT_W'(FIFO_DEPTH);
-    (* ram_style="block" *) reg signed [6:0] cw_mem [0:FIFO_DEPTH*648-1];
+    localparam [SLOT_W-1:0] LAST_SLOT_CONST=SLOT_W'(FIFO_DEPTH-1);
+    localparam integer MEM_DEPTH=FIFO_DEPTH*648;
+    localparam integer MEM_ADDR_W=$clog2(MEM_DEPTH);
     reg [POS_W-1:0] in_pos;
     reg [SLOT_W-1:0] wr_slot,rd_slot;
     reg [CNT_W-1:0] fifo_count;
@@ -34,7 +36,6 @@ module cofdm_qcldpc_codeword_scheduler #(
     reg [SLOT_W-1:0] lane_slot[0:LANES-1];
     reg [POS_W-1:0] lane_pos[0:LANES-1];
     reg lane_assigned[0:LANES-1],lane_feed[0:LANES-1];
-    reg signed [6:0] lane_data[0:LANES-1];
     reg lane_data_valid[0:LANES-1];
     reg [LANES-1:0] lane_start;
     wire [LANES-1:0] lane_ready,lane_ov,lane_ol,lane_ob,lane_done,lane_ok;
@@ -42,6 +43,10 @@ module cofdm_qcldpc_codeword_scheduler #(
     wire [LANES*7-1:0] lane_llr;
     wire [LANES-1:0] lane_in_valid,lane_in_last,lane_out_ready;
     wire [LANES-1:0] lane_assigned_vec;
+    wire [LANES-1:0] mem_rd_en;
+    wire [LANES*MEM_ADDR_W-1:0] mem_rd_addr;
+    wire [LANES*7-1:0] mem_rd_data;
+    wire [MEM_ADDR_W-1:0] mem_wr_addr=MEM_ADDR_W'(wr_slot)*MEM_ADDR_W'(648)+MEM_ADDR_W'(in_pos);
     wire push_word = in_valid && in_ready && in_last && (in_pos==10'd647);
     wire dispatch_possible = (fifo_count != 0);
     integer i,j;
@@ -79,8 +84,16 @@ module cofdm_qcldpc_codeword_scheduler #(
         assign lane_assigned_vec[g]=lane_assigned[g];
         assign lane_in_valid[g]=lane_feed[g] && lane_data_valid[g];
         assign lane_in_last[g]=lane_feed[g] && (lane_pos[g]==10'd647);
-        assign lane_llr[g*7 +: 7]=lane_data[g];
+        assign mem_rd_en[g]=lane_feed[g] &&
+            (!lane_data_valid[g] || (lane_data_valid[g] && lane_ready[g] && lane_pos[g]!=10'd647));
+        assign mem_rd_addr[g*MEM_ADDR_W +: MEM_ADDR_W]=MEM_ADDR_W'(lane_slot[g])*MEM_ADDR_W'(648)+MEM_ADDR_W'(lane_pos[g])+
+            ((lane_data_valid[g]) ? MEM_ADDR_W'(1) : MEM_ADDR_W'(0));
+        assign lane_llr[g*7 +: 7]=mem_rd_data[g*7 +: 7];
         assign lane_out_ready[g]=out_ready && output_select[g];
+        cofdm_qcldpc_bram_replica #(.DEPTH(MEM_DEPTH),.DATA_W(7),.ADDR_W(MEM_ADDR_W)) mem_replica(
+            .clk,.rst,.wr_en(in_valid && in_ready),.wr_addr(mem_wr_addr),.wr_data(in_llr),
+            .rd_en(mem_rd_en[g]),.rd_addr(mem_rd_addr[g*MEM_ADDR_W +: MEM_ADDR_W]),
+            .rd_data(mem_rd_data[g*7 +: 7]));
     end endgenerate
     assign out_valid=have_output;
     // The selected lane's last/bit/status are reduced through the one-hot mask.
@@ -109,29 +122,32 @@ module cofdm_qcldpc_codeword_scheduler #(
         if(rst) begin
             in_pos<=0;wr_slot<=0;rd_slot<=0;fifo_count<=0;head_seq<=0;next_out_seq<=0;
             lane_start<='0;frame_error<=0;codeword_done<=0;
-            for(i=0;i<LANES;i=i+1) begin lane_assigned[i]<=0;lane_feed[i]<=0;lane_pos[i]<=0;lane_slot[i]<=0;lane_data[i]<=0;lane_data_valid[i]<=0;assign_seq[i]<=0;end
+            for(i=0;i<LANES;i=i+1) begin lane_assigned[i]<=0;lane_feed[i]<=0;lane_pos[i]<=0;lane_slot[i]<=0;lane_data_valid[i]<=0;assign_seq[i]<=0;end
         end else begin
             lane_start<='0;codeword_done<=0;
             if(in_valid && in_ready) begin
-                cw_mem[wr_slot*648+in_pos]<=in_llr;
                 if(in_last != (in_pos==10'd647)) begin frame_error<=1;end
-                if(in_pos==10'd647) begin in_pos<=0;wr_slot<=wr_slot+1'b1;end
+                if(in_pos==10'd647) begin
+                    in_pos<=0;
+                    if(wr_slot==LAST_SLOT_CONST) wr_slot<=0;
+                    else wr_slot<=wr_slot+1'b1;
+                end
                 else in_pos<=in_pos+1'b1;
             end
             if(dispatch) begin
                 lane_assigned[dispatch_lane]<=1;lane_feed[dispatch_lane]<=1;lane_pos[dispatch_lane]<=0;lane_data_valid[dispatch_lane]<=0;
                 lane_slot[dispatch_lane]<=rd_slot;assign_seq[dispatch_lane]<=head_seq;head_seq<=head_seq+1'b1;
-                lane_start[dispatch_lane]<=1;rd_slot<=rd_slot+1'b1;
+                lane_start[dispatch_lane]<=1;
+                if(rd_slot==LAST_SLOT_CONST) rd_slot<=0;
+                else rd_slot<=rd_slot+1'b1;
             end
             for(i=0;i<LANES;i=i+1) begin
                 if(lane_feed[i] && !lane_data_valid[i]) begin
-                    lane_data[i]<=cw_mem[lane_slot[i]*648+lane_pos[i]];
                     lane_data_valid[i]<=1;
                 end else if(lane_feed[i] && lane_data_valid[i] && lane_ready[i]) begin
                     if(lane_pos[i]==10'd647) begin lane_feed[i]<=0;lane_data_valid[i]<=0;end
                     else begin
                         lane_pos[i]<=lane_pos[i]+1'b1;
-                        lane_data[i]<=cw_mem[lane_slot[i]*648+lane_pos[i]+1'b1];
                     end
                 end
                 if(lane_done[i]) begin lane_assigned[i]<=0;codeword_done<=1;end
